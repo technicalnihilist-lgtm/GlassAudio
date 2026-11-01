@@ -1,0 +1,4 @@
+// Root build file. Only needed if you prefer Gradle over ./build.sh
+plugins {
+    id 'com.android.application' version '8.5.2' apply false
+}
