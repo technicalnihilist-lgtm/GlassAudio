@@ -1,5 +1,7 @@
 # Glass Audio
 
+![Glass Audio](docs/screenshots/hero.png)
+
 A glassmorphism audio converter for Android. Pick any audio file on your phone,
 polish it, and export a smaller **MP3** or a clean **WAV** — entirely on the
 device, nothing uploaded anywhere.
@@ -8,7 +10,21 @@ The UI is the original single-file web app, wrapped in a thin native Android
 shell that adds the things a browser can't do: a real file picker, saving the
 converted file into your Music folder, and true fullscreen.
 
+**[Download the APK](../../releases/latest)** · Android 7.0+ · 170 KB · no ads, no accounts
+
 ---
+
+## Screenshots
+
+| | | |
+|:--:|:--:|:--:|
+| ![Home](docs/screenshots/01-home.png) | ![Batch](docs/screenshots/02-library.png) | ![Results](docs/screenshots/05-converter.png) |
+| Tap the icon to open | Drop in a whole batch | Each track reports its real saving |
+| ![Settings](docs/screenshots/04-settings.png) | ![Output](docs/screenshots/03-results.png) | |
+| Glass, blur, tint and tilt are live | Preview and download, one per file | |
+
+All screenshots are real captures of this build: an 8.75 MB WAV converted to a
+1.19 MB MP3 (86% smaller) at 192 kbps, 48 kHz stereo.
 
 ## Features
 
@@ -80,6 +96,7 @@ app/assets/www/index.html  the same file, with two lines changed:
                              - native.js is included for the Android bridge
 app/assets/www/native.js   catches blob: downloads and streams them to Java
 app/src/.../MainActivity   WebView shell: asset server, file picker, MediaStore
+docs/screenshots/          real captures of this build
 build.sh                   aapt2 + javac + d8 + zipalign + apksigner
 ```
 
