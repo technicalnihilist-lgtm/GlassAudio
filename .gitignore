@@ -1,0 +1,16 @@
+# build output
+build/
+*.apk
+*.aab
+
+# signing material - never commit a real release key
+keystore/
+*.jks
+*.keystore
+
+# editor / OS noise
+.idea/
+*.iml
+.DS_Store
+.gradle/
+local.properties
