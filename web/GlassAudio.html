@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Glass Audio</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
+<style>
+:root{--ga:.22;--gb:28px;--hue:215;--sp:cubic-bezier(.34,1.56,.64,1)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;color:#fff}
+body{background:linear-gradient(160deg,hsl(var(--hue),80%,45%),hsl(calc(var(--hue) + 70),75%,38%) 55%,hsl(calc(var(--hue) + 140),70%,30%));display:grid;place-items:center}
+.blob{position:fixed;border-radius:50%;opacity:.85;will-change:transform,translate;animation:fl 14s ease-in-out infinite alternate}
+.b1{width:46vmax;height:46vmax;background:radial-gradient(circle,#ff5fa2 0,rgba(255,95,162,0) 68%);top:-12vmax;left:-10vmax}
+.b2{width:40vmax;height:40vmax;background:radial-gradient(circle,#ffc15a 0,rgba(255,193,90,0) 68%);bottom:-14vmax;right:-8vmax;animation-delay:-5s}
+.b3{width:30vmax;height:30vmax;background:radial-gradient(circle,#5af0d2 0,rgba(90,240,210,0) 68%);top:35%;left:45%;animation-delay:-9s}
+@keyframes fl{to{transform:translate(8vmax,6vmax) scale(1.2)}}
+.glass{position:relative;background:rgba(255,255,255,var(--ga));backdrop-filter:blur(var(--gb)) saturate(190%);-webkit-backdrop-filter:blur(var(--gb)) saturate(190%);border:1px solid rgba(255,255,255,.38);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.7),inset 0 -1px 0 rgba(255,255,255,.15),inset 0 0 22px rgba(255,255,255,.08),0 18px 50px rgba(0,0,0,.28)}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(circle at var(--hx,30%) var(--hy,20%),rgba(255,255,255,.4),transparent 45%),linear-gradient(135deg,rgba(255,255,255,.25),rgba(255,255,255,0) 35%,rgba(255,255,255,0) 70%,rgba(255,255,255,.18))}
+#home{position:fixed;inset:0;display:grid;place-items:center;align-content:center;gap:14px;text-align:center}
+#icon{width:96px;height:96px;border-radius:26px;display:grid;place-items:center;font-size:44px;cursor:pointer;border:0;color:#fff;animation:pop .6s var(--sp)}
+#icon:active{transform:scale(.88);transition:.15s}
+#home small{opacity:.85;font-weight:500}
+#home.hide{display:none}
+@keyframes pop{from{transform:scale(.2);opacity:0}}
+#app{position:fixed;inset:0;width:100%;height:100vh;height:100dvh;border-radius:0;border:0;display:none;flex-direction:column;overflow:hidden;transform-origin:50% 100%}
+#app.show{display:flex}
+#app.opening{animation:openB .75s both}
+#app.closing{animation:closeB .5s both}
+@keyframes openB{0%{transform:scale(.25) translateY(120px);opacity:0}45%{opacity:1}60%{transform:scale(1.07) translateY(-8px)}78%{transform:scale(.97)}90%{transform:scale(1.015)}100%{transform:scale(1)}}
+@keyframes closeB{0%{transform:scale(1);opacity:1}28%{transform:scale(1.07) translateY(-10px);opacity:1}100%{transform:scale(.15) translateY(200px);opacity:0}}
+header{display:flex;align-items:center;gap:10px;padding:max(16px,env(safe-area-inset-top)) max(18px,calc((100% - 640px)/2)) 8px}
+header h1{font-size:20px;margin:0;flex:1;font-weight:700;letter-spacing:-.3px}
+.dot{width:16px;height:16px;border-radius:50%;border:0;background:#ff5f57;box-shadow:inset 0 1px 1px rgba(255,255,255,.6);cursor:pointer;transition:transform .2s var(--sp)}
+.dot:active{transform:scale(.7)}
+.gear{width:34px;height:34px;border-radius:50%;border:0;color:#fff;font-size:17px;cursor:pointer}
+main{flex:1;overflow:auto;padding:6px max(16px,calc((100% - 640px)/2)) max(22px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px}
+.card{border-radius:26px;padding:14px 16px}
+#drop{text-align:center;padding:24px 12px;border-style:dashed;cursor:pointer;transition:scale .3s var(--sp)}
+#drop.over{scale:1.03}
+#drop b{display:block;font-size:17px}#drop span{opacity:.8;font-size:13px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0;font-size:15px}
+.seg{display:flex;background:rgba(0,0,0,.18);border-radius:14px;padding:3px;gap:2px}
+.seg button{border:0;background:none;color:#fff;padding:7px 11px;border-radius:11px;font-size:13px;font-weight:600;cursor:pointer;transition:.25s var(--sp)}
+.seg button.on{background:rgba(255,255,255,.34);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 2px 8px rgba(0,0,0,.2)}
+.sw{-webkit-appearance:none;appearance:none;width:51px;height:31px;border-radius:20px;background:rgba(0,0,0,.28);position:relative;cursor:pointer;transition:.3s;flex:none}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.3);transition:.35s var(--sp)}
+.sw:checked{background:#34c759}.sw:checked::after{transform:translateX(20px)}
+input[type=range]{width:55%;accent-color:#fff}
+.btn{border:0;border-radius:20px;padding:15px;font-size:16px;font-weight:700;color:#fff;cursor:pointer;background:rgba(255,255,255,.3);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.7),0 8px 20px rgba(0,0,0,.2);transition:transform .25s var(--sp)}
+.btn:active{transform:scale(.95)}.btn:disabled{opacity:.5}
+.item{border-radius:20px;padding:12px 14px;font-size:14px;animation:pop .45s var(--sp)}
+.item .t{display:flex;justify-content:space-between;gap:8px;font-weight:600}
+.x{border:0;background:rgba(255,255,255,.25);color:#fff;border-radius:50%;width:24px;height:24px;cursor:pointer;flex:none}
+.item .t span:first-child{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar{height:6px;border-radius:4px;background:rgba(0,0,0,.2);margin:8px 0;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:#fff;border-radius:4px;transition:width .2s}
+.item audio{width:100%;height:34px;margin-top:6px}
+.item a{color:#fff;font-weight:700;text-decoration:none;background:rgba(255,255,255,.28);padding:6px 14px;border-radius:14px;display:inline-block;margin-top:6px}
+#set{display:none}#set.show{display:block;animation:pop .45s var(--sp)}
+.note{font-size:12px;opacity:.8;margin:6px 0 0}
+.card,.item{will-change:transform;-webkit-backface-visibility:hidden;backface-visibility:hidden;transform:perspective(900px) rotateX(calc(var(--py,0)*var(--dep,.5)*-8deg)) rotateY(calc(var(--px,0)*var(--dep,.5)*8deg));box-shadow:inset 0 1.5px 0 rgba(255,255,255,.7),inset 0 -1px 0 rgba(255,255,255,.15),calc(var(--px,0)*var(--dep,.5)*-24px) calc(18px + var(--py,0)*var(--dep,.5)*-14px) calc(30px + var(--dep,.5)*34px) rgba(0,0,0,.3)}
+.card>*,.item>*{translate:calc(var(--px,0)*var(--dep,.5)*-5px) calc(var(--py,0)*var(--dep,.5)*-4px)}
+.fs{width:34px;height:34px;border-radius:50%;border:0;color:#fff;font-size:16px;cursor:pointer}
+</style></head><body>
+<div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+
+<div id="home"><button id="icon" class="glass" aria-label="Open">🎧</button><small>Glass Audio — tap to open</small></div>
+
+<div id="app">
+<header><button class="dot" id="close" aria-label="Close"></button><h1>Glass Audio</h1><button class="gear glass fs" id="fs" title="Fullscreen">⛶</button><button class="gear glass" id="gear">⚙︎</button></header>
+<main>
+<div id="set" class="card glass">
+<b>Glass settings</b>
+<div class="row">Transparency<input type="range" id="ga" min="5" max="60" value="22"></div>
+<div class="row">Blur<input type="range" id="gb" min="0" max="60" value="28"></div>
+<div class="row">Tint color<input type="range" id="hue" min="0" max="360" value="215"></div>
+<b>Depth &amp; motion</b>
+<div class="row">Parallax strength<input type="range" id="par" min="0" max="100" value="55"></div>
+<div class="row">3D tilt depth<input type="range" id="dep" min="0" max="100" value="55"></div>
+<div class="row">Tilt with phone motion<input class="sw" type="checkbox" id="gy"></div>
+</div>
+<div id="drop" class="card glass"><b>＋ Add songs</b><span>Tap or drop any audio — MP3, M4A, WAV, FLAC, OGG…</span>
+<input id="fi" type="file" multiple hidden></div>
+<div id="list" style="display:flex;flex-direction:column;gap:10px"></div>
+<div class="card glass">
+<div class="row">Output<div class="seg" id="fmt"><button data-v="mp3" class="on">MP3</button><button data-v="wav">WAV</button></div></div>
+<div class="row" id="brRow">Quality<div class="seg" id="kb"><button data-v="128">128</button><button data-v="192" class="on">192</button><button data-v="256">256</button><button data-v="320">320</button></div></div>
+<div class="row">Upsample to 48 kHz<input class="sw" type="checkbox" id="up" checked></div>
+<div class="row">Clarity &amp; warmth boost<input class="sw" type="checkbox" id="clar" checked></div>
+<div class="row">Normalize loudness<input class="sw" type="checkbox" id="norm" checked></div>
+<div class="row">Smart size (auto mono)<input class="sw" type="checkbox" id="mono" checked></div>
+<p class="note">Enhancement polishes sound but can't restore detail already lost in a low-quality original. Smart size shrinks files by using mono only when both channels are identical — no audible change.</p>
+</div>
+<button class="btn" id="go" disabled>Convert all</button>
+</main></div>
+
+<script>
+const $=s=>document.querySelector(s),S={fmt:'mp3',kbps:192};let items=[],busy=false;
+const R=document.documentElement.style;
+function load(){try{const v=JSON.parse(localStorage.getItem('ga')||'{}');K.forEach(k=>{if(v[k]!=null)$('#'+k).value=v[k]})}catch(e){}apply()}
+const K=['ga','gb','hue','par','dep'];
+function apply(){R.setProperty('--ga',$('#ga').value/100);R.setProperty('--gb',$('#gb').value+'px');R.setProperty('--hue',$('#hue').value);try{const o={};K.forEach(k=>o[k]=$('#'+k).value);localStorage.setItem('ga',JSON.stringify(o))}catch(e){}}
+K.forEach(k=>$('#'+k).oninput=apply);load();
+function open_(){$('#home').classList.add('hide');const a=$('#app');a.className='show opening';setTimeout(()=>a.classList.remove('opening'),800)}
+function close_(){const a=$('#app');a.classList.add('closing');setTimeout(()=>{a.className='';const h=$('#home');h.classList.remove('hide');const i=$('#icon');i.style.animation='none';i.offsetWidth;i.style.animation=''},480)}
+$('#icon').onclick=open_;$('#close').onclick=close_;$('#gear').onclick=()=>$('#set').classList.toggle('show');
+setTimeout(open_,150);
+function seg(id,fn){$(id).onclick=e=>{const b=e.target.closest('button');if(!b)return;$(id).querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');fn(b.dataset.v)}}
+seg('#fmt',v=>{S.fmt=v;reset();$('#brRow').style.display=v==='mp3'?'':'none'});seg('#kb',v=>{S.kbps=+v;reset()});
+function reset(){items.forEach(i=>{if(i.done){if(i.url)URL.revokeObjectURL(i.url);i.done=false;setP(i,'Settings changed — press Convert',0)}});$('#go').textContent='Convert all'}
+['#up','#clar','#norm','#mono'].forEach(id=>$(id).addEventListener('change',reset));
+const drop=$('#drop');$('#fi').onclick=e=>e.stopPropagation();drop.onclick=()=>$('#fi').click();
+drop.ondragover=e=>{e.preventDefault();drop.classList.add('over')};drop.ondragleave=()=>drop.classList.remove('over');
+drop.ondrop=e=>{e.preventDefault();drop.classList.remove('over');add(e.dataTransfer.files)};
+$('#fi').onchange=e=>{add(e.target.files);e.target.value=''};
+const mb=n=>(n/1048576).toFixed(2)+' MB';
+function add(fs){[...fs].forEach(f=>{const el=document.createElement('div');el.className='item glass';el.innerHTML=`<div class="t"><span></span><span>${mb(f.size)}</span><button class="x">✕</button></div><div class="bar"><i></i></div><div class="st">Ready</div>`;el.querySelector('span').textContent=f.name;const it={f,el,done:false};el.querySelector('.x').onclick=()=>{if(it.url)URL.revokeObjectURL(it.url);items=items.filter(x=>x!==it);el.remove();$('#go').disabled=busy||!items.length};$('#list').append(el);items.push(it)});$('#go').disabled=busy||!items.length}
+const setP=(it,t,p)=>{it.el.querySelector('.st').textContent=t;if(p!=null)it.el.querySelector('i').style.width=p+'%'};
+const tick=()=>new Promise(r=>setTimeout(r));
+const i16=(a,s,n,g)=>{const e=Math.min(a.length,s+n),o=new Int16Array(e-s);for(let i=s;i<e;i++){const v=Math.max(-1,Math.min(1,a[i]*g));o[i-s]=v<0?v*32768:v*32767}return o};
+let FF;
+const loadScript=u=>new Promise((res,rej)=>{const s=document.createElement('script');s.src=u;s.onload=res;s.onerror=()=>rej(new Error('Universal decoder could not load (internet needed)'));document.head.append(s)});
+async function ffDecode(raw){
+ if(!FF){await loadScript('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js');
+  FF=FFmpeg.createFFmpeg({log:false,corePath:'https://cdn.jsdelivr.net/npm/@ffmpeg/core-st@0.11.1/dist/ffmpeg-core.js'});await FF.load()}
+ FF.FS('writeFile','in.bin',new Uint8Array(raw));
+ try{try{await FF.run('-i','in.bin','-vn','-ac','2','-ar','48000','out.wav')}catch(e){FF=null;throw new Error('This file could not be decoded (not an audio/video file?)')}const d=FF.FS('readFile','out.wav');return d.buffer.slice(d.byteOffset,d.byteOffset+d.byteLength)}
+ finally{try{FF&&FF.FS('unlink','in.bin');FF&&FF.FS('unlink','out.wav')}catch(e){}}
+}
+async function conv(it){
+ setP(it,'Decoding…',5);
+ const ac=new(window.AudioContext||window.webkitAudioContext)();let dec;
+ const raw=await it.f.arrayBuffer();
+ try{dec=await ac.decodeAudioData(raw.slice(0))}
+ catch(e){setP(it,'Rare format — loading universal decoder (one-time ~25 MB)…',8);dec=await ac.decodeAudioData(await ffDecode(raw))}
+ finally{ac.close&&ac.close()}
+ const sr=$('#up').checked?48000:(dec.sampleRate>=48000?48000:[44100,32000].includes(dec.sampleRate)?dec.sampleRate:44100);
+ const ch=Math.min(2,dec.numberOfChannels);setP(it,'Enhancing…',20);
+ const off=new OfflineAudioContext(ch,Math.ceil(dec.duration*sr),sr),src=off.createBufferSource();src.buffer=dec;let n=src;
+ if($('#clar').checked)[['lowshelf',100,1.5],['peaking',3500,1.5],['highshelf',9000,3]].forEach(([t,f,g])=>{const b=off.createBiquadFilter();b.type=t;b.frequency.value=f;b.gain.value=g;n.connect(b);n=b});
+ n.connect(off.destination);src.start();
+ const out=await off.startRendering(),L=out.getChannelData(0);let Rr=ch>1?out.getChannelData(1):null;
+ let g=1;if($('#norm').checked){let p=0;for(let i=0;i<L.length;i++){const v=Math.abs(L[i]);if(v>p)p=v}if(Rr)for(let i=0;i<Rr.length;i++){const v=Math.abs(Rr[i]);if(v>p)p=v}if(p>.02)g=Math.min(4,.97/p)}
+ if(Rr&&$('#mono').checked){let d=0;for(let i=0;i<L.length;i+=7)d=Math.max(d,Math.abs(L[i]-Rr[i]));if(d<1e-4)Rr=null}
+ let blob,ext;
+ if(S.fmt==='mp3'){
+  if(typeof lamejs==='undefined')throw new Error('MP3 encoder not loaded (check internet)');
+  ext='mp3';const enc=new lamejs.Mp3Encoder(Rr?2:1,sr,Rr?S.kbps:S.kbps/2),parts=[],bs=1152*20;
+  for(let i=0,k=0;i<L.length;i+=bs,k++){const l=i16(L,i,bs,g),b=Rr?enc.encodeBuffer(l,i16(Rr,i,bs,g)):enc.encodeBuffer(l);if(b.length)parts.push(new Uint8Array(b));if(k%8==0){setP(it,'Encoding MP3…',30+65*i/L.length);await tick()}}
+  parts.push(new Uint8Array(enc.flush()));blob=new Blob(parts,{type:'audio/mpeg'});
+ }else{
+  ext='wav';const c=Rr?2:1,len=L.length*c*2,buf=new ArrayBuffer(44+len),v=new DataView(buf),w=(o,s)=>[...s].forEach((x,i)=>v.setUint8(o+i,x.charCodeAt(0)));
+  w(0,'RIFF');v.setUint32(4,36+len,true);w(8,'WAVEfmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,c,true);v.setUint32(24,sr,true);v.setUint32(28,sr*c*2,true);v.setUint16(32,c*2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,len,true);
+  const a=i16(L,0,L.length,g),b=Rr?i16(Rr,0,Rr.length,g):null;let o=44;
+  for(let i=0;i<a.length;i++){v.setInt16(o,a[i],true);o+=2;if(b){v.setInt16(o,b[i],true);o+=2}if(i%400000==0){setP(it,'Writing WAV…',30+65*i/a.length);await tick()}}
+  blob=new Blob([buf],{type:'audio/wav'});
+ }
+ const url=URL.createObjectURL(blob),pct=Math.round((1-blob.size/it.f.size)*100),name=it.f.name.replace(/\.[^.]+$/,'')+'_HQ.'+ext;
+ setP(it,'',100);const st=it.el.querySelector('.st');
+ st.innerHTML=`✅ ${mb(it.f.size)} → <b>${mb(blob.size)}</b> (${pct>=0?pct+'% smaller':-pct+'% larger'}) · ${sr/1000} kHz ${Rr?'stereo':'mono'}<br><audio controls src="${url}"></audio><br><a download="${name.replace(/"/g,'')}" href="${url}">⬇ Download</a>`;
+ it.done=true;it.url=url;
+}
+$('#go').onclick=async()=>{if(busy)return;busy=true;$('#go').disabled=true;for(const it of items.filter(x=>!x.done)){try{await conv(it)}catch(e){const m=typeof e==='string'?e:(e&&e.message)||'Could not decode this file';setP(it,'⚠️ '+m,0)}}busy=false;$('#go').disabled=!items.length;$('#go').textContent='Convert again'};
+
+let tx=0,ty=0,cx=0,cy=0,last=0;const bl=[...document.querySelectorAll('.blob')];
+addEventListener('pointermove',e=>{if(e.pointerType==='touch'||(e.buttons&&e.target.closest('input[type=range]')))return;tx=(e.clientX/innerWidth-.5)*2;ty=(e.clientY/innerHeight-.5)*2;last=performance.now()});
+$('#gy').onchange=async e=>{if(!e.target.checked)return;try{if(window.DeviceOrientationEvent&&DeviceOrientationEvent.requestPermission){if(await DeviceOrientationEvent.requestPermission()!=='granted')e.target.checked=false}}catch(_){e.target.checked=false}};
+addEventListener('deviceorientation',e=>{if(!$('#gy').checked||e.gamma==null)return;tx=Math.max(-1,Math.min(1,e.gamma/25));ty=Math.max(-1,Math.min(1,(e.beta-45)/25));last=performance.now()});
+$('#fs').onclick=()=>{const d=document,e=d.documentElement;if(d.fullscreenElement||d.webkitFullscreenElement)(d.exitFullscreen||d.webkitExitFullscreen).call(d);else if(e.requestFullscreen||e.webkitRequestFullscreen)(e.requestFullscreen||e.webkitRequestFullscreen).call(e);else alert('iPhone: Share → Add to Home Screen for full screen')};
+(function loop(t){const par=$('#par').value/100,dep=$('#dep').value/100;
+ if(t-last>3500){tx=Math.sin(t/2200)*.45;ty=Math.cos(t/2900)*.35}
+ cx+=(tx-cx)*.07;cy+=(ty-cy)*.07;
+ R.setProperty('--px',cx.toFixed(3));R.setProperty('--py',cy.toFixed(3));R.setProperty('--dep',dep);
+ R.setProperty('--hx',(50+cx*40).toFixed(1)+'%');R.setProperty('--hy',(30+cy*40).toFixed(1)+'%');
+ bl.forEach((b,i)=>{const k=[.6,1,1.6][i]*par*90;b.style.translate=(-cx*k)+'px '+(-cy*k)+'px'});
+ requestAnimationFrame(loop)})(0);
+</script></body></html>
