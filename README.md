@@ -1,12 +1,12 @@
 <div align="center">
 
-<img src="assets/icon.png" width="96" height="96" alt="Glassmorphism audio converter for Android - MP3/WAV export, on-device icon">
+<img src="assets/icon.png" width="96" height="96" alt="Glass Audio icon">
 
-<img src="assets/banner.svg" alt="Glassmorphism audio converter for Android - MP3/WAV export, on-device">
+<img src="assets/banner.svg" alt="Glass Audio">
 
 <a href="https://github.com/technicalnihilist-lgtm/GlassAudio/stargazers"><img src="https://img.shields.io/badge/stars-0-5A31F4?style=for-the-badge&logo=github&logoColor=white" alt="stars: 0"></a>&nbsp;<a href="https://github.com/technicalnihilist-lgtm/GlassAudio/network/members"><img src="https://img.shields.io/badge/forks-0-3FB950?style=for-the-badge" alt="forks: 0"></a>
 
-<a href="https://github.com/technicalnihilist-lgtm/GlassAudio/releases/latest"><img src="https://img.shields.io/badge/DOWNLOAD-APK-6D5AE6?style=for-the-badge&logo=android&logoColor=white" alt="Download APK"></a>
+<a href="https://github.com/technicalnihilist-lgtm/GlassAudio/releases/latest/download/GlassAudio.apk"><img src="https://img.shields.io/badge/DOWNLOAD-APK-6D5AE6?style=for-the-badge&logo=android&logoColor=white" alt="Download APK"></a> <a href="https://technicalnihilist-lgtm.github.io/apps-site/apps/GlassAudio.html"><img src="https://img.shields.io/badge/WEBSITE-OPEN-3B82F6?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Website"></a>
 
 <b>Support the work</b>
 
